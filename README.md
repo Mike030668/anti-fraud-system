@@ -1,4 +1,27 @@
-# Проект антифрод-системы 
+# Проект антифрод-системы:
+
+anti-fraud-system/
+      ├─ infra/
+      │  ├─ provider.tf
+      │  ├─ main.tf
+      │  ├─ variables.tf
+      │  ├─ outputs.tf
+      │  ├─ terraform.tfvars.example
+      │  └─ scripts/
+      │      ├─ user_data.sh
+      │      └─ upload_data_to_hdfs.sh
+      │ 
+      ├─ Makefile           # цели init/apply/destroy (в корне репо)
+      ├─ check.sh           # быстрые проверки окружения
+      ├─ docs/
+      │     ├─ tasks
+      │     │    └─ hw_02.md    # задания
+      │     │
+      │     └─  README_HW2.md # пошаговая инструкция запуска
+      ├─ .gitignore
+      │  
+      └─ README.md
+
 
 ## 1. Сбор и синтез требований
 
