@@ -24,6 +24,7 @@ anti-fraud-system/
       └─ README.md
 
 
+
 ## 1. Сбор и синтез требований
 
 | Параметр                          | Значение                                | Источник (страница/файл) |
@@ -104,3 +105,16 @@ anti-fraud-system/
 4. **Развернуть REST API для inference:** в течение **5 недель** реализовать Docker-контейнер с API, обеспечивающим латентность не более **100 ms** по 95‑му процентилю на 400 TPS.
 5. **Настроить мониторинг и алертинг:** к концу **6 недель** интегрировать Prometheus и Grafana для метрик (**TPR**, **FPR**, **latency**) и реализовать алерты при **FPR > 5%** или **latency > 100 ms**.
 
+
+
+# Check used yandex resources
+```bash
+yc compute instance list
+yc vpc network list
+yc vpc subnet list
+yc vpc security-group list
+yc vpc gateway list
+yc vpc route-table list
+yc iam service-account list
+yc storage bucket list
+```
