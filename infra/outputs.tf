@@ -6,3 +6,9 @@ output "proxy_public_ip" {
 output "bucket_name" {
   value = yandex_storage_bucket.data_bucket.bucket
 }
+
+
+# outputs.tf
+output "source_bucket_name" {
+  value = var.source_bucket_name
+}

@@ -14,8 +14,10 @@ resource "yandex_resourcemanager_folder_iam_member" "sa_roles" {
     "vpc.user",
     "iam.serviceAccounts.user",
     "storage.uploader",
+    "monitoring.viewer",
     "storage.viewer",
     "storage.editor"
+
   ])
 
   folder_id = var.yc_folder_id
@@ -23,7 +25,7 @@ resource "yandex_resourcemanager_folder_iam_member" "sa_roles" {
   member    = "serviceAccount:${yandex_iam_service_account.sa.id}"
 }
 
-resource "yandex_iam_service_account_static_access_key" "sa-static-key" {
+resource "yandex_iam_service_account_static_access_key" "sa_static_key" {
   service_account_id = yandex_iam_service_account.sa.id
   description        = "Static access key for object storage"
 }
@@ -116,9 +118,12 @@ resource "yandex_vpc_security_group" "security_group" {
 # Storage ресурсы
 resource "yandex_storage_bucket" "data_bucket" {
   bucket        = "${var.yc_bucket_name}-${var.yc_folder_id}"
-  access_key    = yandex_iam_service_account_static_access_key.sa-static-key.access_key
-  secret_key    = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
-  force_destroy = true
+  access_key    = yandex_iam_service_account_static_access_key.sa_static_key.access_key
+  secret_key    = yandex_iam_service_account_static_access_key.sa_static_key.secret_key
+  force_destroy = false
+  #lifecycle {
+  #  prevent_destroy = true # Предотвращает удаление бакета
+  #}
 }
 
 # Dataproc ресурсы https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/dataproc_cluster
@@ -132,14 +137,17 @@ resource "yandex_dataproc_cluster" "dataproc_cluster" {
   }
   service_account_id = yandex_iam_service_account.sa.id
   zone_id            = var.yc_zone
+  ui_proxy           = true
   security_group_ids = [yandex_vpc_security_group.security_group.id]
 
+  environment = "PRODUCTION"
 
   cluster_config {
     version_id = var.yc_dataproc_version
 
     hadoop {
-      services = ["HDFS", "YARN", "SPARK", "HIVE", "TEZ"]
+
+      services = ["HDFS", "YARN", "SPARK"] #, "HIVE", "TEZ"]
       properties = {
         "yarn:yarn.resourcemanager.am.max-attempts" = 5
       }
@@ -168,7 +176,7 @@ resource "yandex_dataproc_cluster" "dataproc_cluster" {
         disk_size          = var.dataproc_data_resources.disk_size
       }
       subnet_id   = yandex_vpc_subnet.subnet.id
-      hosts_count = 1
+      hosts_count = 3
     }
 
     subcluster_spec {
@@ -179,8 +187,10 @@ resource "yandex_dataproc_cluster" "dataproc_cluster" {
         disk_type_id       = "network-ssd"
         disk_size          = var.dataproc_compute_resources.disk_size
       }
+
       subnet_id   = yandex_vpc_subnet.subnet.id
       hosts_count = 1
+
     }
   }
 }
@@ -207,8 +217,8 @@ resource "yandex_compute_instance" "proxy" {
       cloud_id                    = var.yc_cloud_id
       folder_id                   = var.yc_folder_id
       private_key                 = file(var.private_key_path)
-      access_key                  = yandex_iam_service_account_static_access_key.sa-static-key.access_key
-      secret_key                  = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
+      access_key                  = yandex_iam_service_account_static_access_key.sa_static_key.access_key
+      secret_key                  = yandex_iam_service_account_static_access_key.sa_static_key.secret_key
       s3_bucket                   = yandex_storage_bucket.data_bucket.bucket
       upload_data_to_hdfs_content = file("${path.root}/scripts/upload_data_to_hdfs.sh")
     })
