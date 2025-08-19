@@ -10,8 +10,9 @@ anti-fraud-system/
       │  └─ scripts/
       │      ├─ user_data.sh
       │      └─ upload_data_to_hdfs.sh
-      │ 
-      ├─ Makefile           # цели init/apply/destroy (в корне репо)
+      │
+      ├─ .bashrc
+      ├─ Makefile           # цели init/apply/destroy
       ├─ check.sh           # быстрые проверки окружения
       ├─ docs/
       │     ├─ tasks
